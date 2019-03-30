@@ -10,8 +10,7 @@ RUN curl -s --remote-name http://packages.ntop.org/apt/18.04/all/apt-ntop.deb &&
 
 RUN apt update && apt-get -y -q install ntopng libpcap0.8 libmariadbclient18 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN ls /opt/
-RUN find / -iname ntopng -type f -print 
+#RUN find / -iname ntopng -type f -print 
 
 EXPOSE 3000
 
