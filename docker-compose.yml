@@ -1,0 +1,36 @@
+version: '2.0'
+services:
+ ntopng:
+  image: edgd1er/ntopng-docker
+  build:
+   context: .
+   dockerfile: Dockerfile 
+  restart: always
+  logging:
+    driver: json-file
+    options:
+     max-size: "10m"
+     max-file: "3"
+  network_mode: host
+  volumes:
+    - "/var/lib/ntopng:/var/lib/ntopng"
+  command: -w 0.0.0.0:27833 -r localhost:6379 -Z "/monitor"
+  ports:
+   - "3000:3000"
+  depends_on:
+   - redis
+ redis:
+  image: redis:3.0
+  restart: always
+  logging:
+    driver: json-file
+    options:
+     max-size: "10m"
+     max-file: "3"
+  ports:
+    - 6379:6379
+
+networks:
+  default:
+    driver: bridge
+
