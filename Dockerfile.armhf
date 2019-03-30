@@ -1,0 +1,16 @@
+FROM balenalib/armv7hf-debian:stretch
+MAINTAINER edgd1er <edgd1er@hotmail.com>
+
+RUN apt clean all && \
+ apt-get update && apt-get -y -q install wget lsb-release 
+RUN wget -qO - http://packages.ntop.org/apt/ntop.key | sudo apt-key add - 
+RUN echo "deb http://apt.ntop.org/stretch_pi armhf/" > /etc/apt/sources.list.d/ntop.list && \
+ echo "deb http://apt.ntop.org/stretch_pi all/" >> /etc/apt/sources.list.d/ntop.list 
+
+RUN apt update && apt-get -y -q install ntopng libpcap0.8 libmariadbclient18 
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN find / -iname ntopng -type f -print 
+
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/bin/ntopng"]
