@@ -15,8 +15,6 @@ services:
   volumes:
     - "/var/lib/ntopng:/var/lib/ntopng"
   command: -w 0.0.0.0:27833 -r localhost:6379 -Z "/monitor"
-  ports:
-   - "3000:3000"
   depends_on:
    - redis
  redis:
