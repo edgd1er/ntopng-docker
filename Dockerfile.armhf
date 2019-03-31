@@ -1,5 +1,6 @@
 FROM balenalib/armv7hf-debian:stretch
 MAINTAINER edgd1er <edgd1er@hotmail.com>
+RUN [ “cross-build-start” ]
 
 RUN apt clean all && \
  apt-get update && apt-get -y -q install wget lsb-release 
@@ -14,3 +15,5 @@ RUN find / -iname ntopng -type f -print
 EXPOSE 3000
 
 ENTRYPOINT ["/usr/bin/ntopng"]
+
+RUN [ “cross-build-end” ]
