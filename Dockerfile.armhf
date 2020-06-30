@@ -1,5 +1,5 @@
 ARG DISTRO
-FROM balenalib/${DISTRO}:focal-run
+FROM balenalib/${DISTRO}:burster-run
 MAINTAINER edgd1er <edgd1er@hotmail.com>
 RUN [ “cross-build-start” ]
 
