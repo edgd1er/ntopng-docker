@@ -23,8 +23,8 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
  fi;
 
 RUN apt-get clean all && apt-get update && \
- apt-cache policy ntopng && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\*
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\*
+RUN apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN if [ -n $aptcacher ]; then echo "" > /etc/apt/apt.conf.d/01proxy; fi
 ADD start.sh /start.sh
 RUN chmod +x /start.sh
