@@ -27,4 +27,4 @@ jobs:
           echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
       - name: Run Buildx
         run: |
-          docker buildx build --output "type=image,push=false" --platform linux/arm/v7,linux/amd64  -f Dockerfile.all -t edgd1er/ntopng-docker:latest .
+          docker buildx build --output "type=image,push=true" --platform linux/arm/v7,linux/amd64  -f Dockerfile.all -t edgd1er/ntopng-docker:latest .
