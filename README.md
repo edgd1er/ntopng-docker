@@ -26,3 +26,5 @@ docker-compose up -d
 ```
 - navigate to 0.0.0.0:27833
 - set admin password ( default login/pwd is admin/admin)
+
+env value NTOP_UID and NTOP_GID are available to match user and group of local mounted volumes (./data/notpng, ./data/redis)
