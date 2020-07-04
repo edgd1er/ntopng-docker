@@ -1,8 +1,6 @@
 FROM debian:buster-slim
 MAINTAINER edgd1er <edgd1er@hotmail.com>
 
-ENV TZ=Europe/ParisMAINTAINER edgd1er <edgd1er@hotmail.com>
-
 ENV TZ=Europe/Paris
 RUN apt clean all && \
  apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -q install curl  lsb-release
