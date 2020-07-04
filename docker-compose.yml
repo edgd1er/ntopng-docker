@@ -24,7 +24,7 @@ services:
     volumes:
       - ./data/ntopng:/var/lib/ntopng
       #- data_ntopng:/var/lib/ntopng
-    command: --community -d /var/lib/ntopng -w 0.0.0.0:27833 -r localhost:6379 -Z "/monitor"
+    command: --community -d /var/lib/ntopng -w 0.0.0.0:27833 -r redis:6379 -Z "/monitor"
     depends_on:
       - redis
   redis:
@@ -40,7 +40,7 @@ services:
         max-size: "10m"
         max-file: "3"
     ports:
-      - 6379:6379
+      - "6379:6379"
 
 networks:
   default:
