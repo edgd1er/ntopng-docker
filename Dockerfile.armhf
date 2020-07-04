@@ -1,7 +1,7 @@
-ARG DISTRO
-FROM balenalib/${DISTRO}:buster-run
+FROM debian:buster-slim
 MAINTAINER edgd1er <edgd1er@hotmail.com>
-RUN [ “cross-build-start” ]
+
+ENV TZ=Europe/Paris
 
 RUN apt clean all && \
  apt-get update && apt-get -y -q install wget lsb-release 
@@ -9,12 +9,10 @@ RUN wget -qO - http://packages.ntop.org/apt/ntop.key | sudo apt-key add -
 RUN echo "deb http://apt.ntop.org/buster_pi armhf/" > /etc/apt/sources.list.d/ntop.list && \
  echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list
 
-RUN apt update && apt-get -y -q install ntopng libpcap0.8 libmariadbclient18 
+RUN apt update && apt-cache search libmariadbclient* libpcap* && apt-get -y -q install ntopng libpcap0.8 mariadb-client
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN find / -iname ntopng -type f -print 
 
-EXPOSE 3000
+EXPOSE 3001
 
 ENTRYPOINT ["/usr/bin/ntopng"]
-
-RUN [ “cross-build-end” ]

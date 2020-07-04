@@ -1,0 +1,46 @@
+FROM debian:buster-slim
+MAINTAINER edgd1er <edgd1er@hotmail.com>
+
+ARG aptcacher
+ARG TZ
+
+ENV TZ=${TZ}
+#add apt-cacher setting if present:
+RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
+    echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi
+
+RUN apt clean all && \
+ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -q install wget lsb-release gnupg tzdata
+RUN wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+ wget http://apt.ntop.org/buster/all/apt-ntop.deb && \
+ apt install -y ./apt-ntop.deb  ; rm -rf apt-ntop.deb; \
+ cat /etc/apt/sources.list.d/ntop.list ;\
+ else \
+ echo "deb http://apt.ntop.org/buster_pi armhf/" > /etc/apt/sources.list.d/ntop.list; \
+ echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list; \
+ cat /etc/apt/sources.list.d/ntop.list ;\
+ fi;
+
+RUN apt-get clean all && apt-get update && \
+ apt-cache policy ntopng && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN if [ -n $aptcacher ]; then echo "" > /etc/apt/apt.conf.d/01proxy; fi
+ADD start.sh /start.sh
+RUN chmod +x /start.sh
+
+VOLUME /var/lib/ntopng
+
+EXPOSE 3001 5556
+
+ENTRYPOINT ["/start.sh"]
+
+#HEALTHCHECK curl --connect-timeout 15 --silent --show-error --fail "http://localhost:3001" >/dev/null
+
+CMD [                                         \
+        "--community",                        \
+        "--data-dir", "/var/lib/ntopng",      \
+        "--http-port", "0.0.0.0:3000",        \
+        "--interface", "tcp://0.0.0.0:5556", \
+        "--redis", "redis"                    \
+    ]
