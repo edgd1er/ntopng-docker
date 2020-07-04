@@ -1,4 +1,4 @@
-FROM arm32v7/debian
+FROM resin/armv7hf-debian
 RUN [ “cross-build-start” ]
 MAINTAINER edgd1er <edgd1er@hotmail.com>
 
