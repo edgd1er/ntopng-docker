@@ -4,7 +4,7 @@ MAINTAINER edgd1er <edgd1er@hotmail.com>
 ENV TZ=Europe/Paris
 
 RUN apt clean all && \
- apt-get update && apt-get -y -q install wget lsb-release 
+ apt-get update && apt-get install -yq wget lsb-release gnupg
 RUN wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
 RUN echo "deb http://apt.ntop.org/buster_pi armhf/" > /etc/apt/sources.list.d/ntop.list && \
  echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list
