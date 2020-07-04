@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM arm32v7/debian
 MAINTAINER edgd1er <edgd1er@hotmail.com>
 RUN [ “cross-build-start” ]
 
