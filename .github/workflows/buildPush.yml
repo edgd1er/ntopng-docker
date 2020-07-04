@@ -25,3 +25,7 @@ jobs:
       - name: Run Buildx
         run: |
           docker buildx build --output "type=image,push=true" --platform linux/arm/v7,linux/amd64  -f Dockerfile.all -t edgd1er/ntopng-docker:latest .
+      - name: clean
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          rm -f ${HOME}/.docker/config.json
