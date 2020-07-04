@@ -7,7 +7,8 @@ RUN apt clean all && \
  apt-get update && apt-get install -yq wget lsb-release gnupg
 RUN wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add - && \
  echo "deb http://apt.ntop.org/buster_pi armhf/" > /etc/apt/sources.list.d/ntop.list && \
- echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list
+ echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list && \
+ cat /etc/apt/sources.list.d/ntop.list
 RUN apt-get clean all && apt-get update && \
      DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\*
 RUN apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
