@@ -1,4 +1,4 @@
-name: build nut multi-arch images
+name: build ntopng-docker multi-arch images
 
 on:
   push:
@@ -18,6 +18,13 @@ jobs:
           qemu-version: latest
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
+      - name: Docker Login
+        if: github.event_name != 'pull_request'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
       - name: Run Buildx
         run: |
           docker buildx build --output "type=image,push=false" --platform linux/arm/v7,linux/amd64  -f Dockerfile.all -t edgd1er/ntopng-docker:latest .
