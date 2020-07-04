@@ -1,3 +1,5 @@
+![build ntopng-docker multi-arch images](https://github.com/edgd1er/ntopng-docker/workflows/build%20ntopng-docker%20multi-arch%20images/badge.svg?branch=master)
+
 # ntopng-docker
 
 simple container to analyze network traffic based on https://github.com/Laisky/ntopng-docker for amd64 and arm.
