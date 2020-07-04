@@ -5,13 +5,16 @@ ARG aptcacher
 ARG TZ
 
 ENV TZ=${TZ}
+ADD start.sh /start.sh
+
 #add apt-cacher setting if present:
 RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
     echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi
 
-RUN apt clean all && \
- apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -q install wget lsb-release gnupg tzdata
-RUN wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
+RUN chmod +x /start.sh && apt clean all && \
+ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -q install wget lsb-release gnupg tzdata && \
+ wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
+
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
  wget http://apt.ntop.org/buster/all/apt-ntop.deb && \
  apt install -y ./apt-ntop.deb  ; rm -rf apt-ntop.deb; \
@@ -23,11 +26,9 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
  fi;
 
 RUN apt-get clean all && apt-get update && \
- DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\*
-RUN apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN if [ -n $aptcacher ]; then echo "" > /etc/apt/apt.conf.d/01proxy; fi
-ADD start.sh /start.sh
-RUN chmod +x /start.sh
+ DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* && \
+ apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+ if [ -n $aptcacher ]; then echo "" > /etc/apt/apt.conf.d/01proxy; fi
 
 VOLUME /var/lib/ntopng
 
