@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.all
       args:
-        - aptcacher=192.168.53.208
+        - aptcacher= #192.168.53.208
         - TZ=Europe/Paris
     restart: always
     environment:
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./data/ntopng:/var/lib/ntopng
       #- data_ntopng:/var/lib/ntopng
-    command: --community -d /var/lib/ntopng -w 0.0.0.0:27833 -r redis:6379 -Z "/monitor"
+    command: --community -d /var/lib/ntopng -w 0.0.0.0:27833 -r localhost:6379 -Z "/monitor"
     depends_on:
       - redis
   redis:
