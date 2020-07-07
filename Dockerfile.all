@@ -25,10 +25,10 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
  cat /etc/apt/sources.list.d/ntop.list ;\
  fi;
 
-RUN apt-get clean all && apt-get update && \
+RUN apt-get clean all && apt-get update && apt-get upgrade -y && \
  DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* && \
  apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
- if [ -n $aptcacher ]; then echo "" > /etc/apt/apt.conf.d/01proxy; fi
+ if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi
 
 VOLUME /var/lib/ntopng
 
