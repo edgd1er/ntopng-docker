@@ -28,3 +28,6 @@ docker-compose up -d
 - set admin password ( default login/pwd is admin/admin)
 
 env value NTOP_UID and NTOP_GID are available to match user and group of local mounted volumes (./data/notpng, ./data/redis)
+
+Note that with netplan.io, it is not possible to set an interface in promiscous mode, ie you can't monitor all flows, but only flows from or to the host.
+if anyone knows how to do with netplan, please let me know. 

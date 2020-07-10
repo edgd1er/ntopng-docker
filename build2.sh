@@ -3,7 +3,7 @@
 CACHE=""
 #CACHE=" --no-cache"
 aptcacher=$(ip route get 1 | awk '{print $7}')
-WHERE="-load"
+WHERE="--load"
 PTF=linux/arm/v7
 
 usage() { echo "Usage: $0 [-c ] no build cache [ -w <load|push>] load into docker images, or push to registry ]" 1>&2; exit 1; }
