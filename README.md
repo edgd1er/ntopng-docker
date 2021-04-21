@@ -5,10 +5,15 @@
 simple container to analyze network traffic based on https://github.com/Laisky/ntopng-docker for amd64 and arm.
 
 * use debian buster-slim image to have small base image
+* add nightly build for ntopng https://packages.ntop.org/apt/
+* as of 2021/04/21, ntop version is v.4.3
+  
+    armhf latest version is here: https://packages.ntop.org/RaspberryPI/buster_pi/armhf/ntopng/
+    
 
-* add nightly build for ntopng http://packages.ntop.org/apt/
+Official Docker file are here: https://github.com/ntop/docker-ntop
 
-* as of 2020/07/03, ntop version is v.4.1
+Official (x86_64) containers are here:  https://hub.docker.com/r/ntop/ntopng
 
 ## Usage
 

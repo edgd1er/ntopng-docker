@@ -1,39 +1,40 @@
 FROM debian:buster-slim
-MAINTAINER edgd1er <edgd1er@hotmail.com>
+LABEL maintainer="edgd1er <edgd1er@hotmail.com>"
 
 ARG aptcacher
 ARG TZ
 
 ENV TZ=${TZ}
-ADD start.sh /start.sh
 
 #add apt-cacher setting if present:
 RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
-    echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi
+    echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi; \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -qy wget lsb-release gnupg tzdata && \
+    wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add - \
+    #wget http://apt.ntop.org/buster/all/apt-ntop.deb && apt-get install -qy ./apt-ntop.deb && rm -rf apt-ntop.deb \
+    #apt-get -y -q install wget lsb-release gnupg && wget -q http://packages.ntop.org/RaspberryPI/apt-ntop_1.0.190416-469_all.deb && dpkg -i apt-ntop_1.0.190416-469_all.deb && apt-get clean all \
+    && if [ "$(uname -m)" = "x86_64" ]; then \
+    echo "deb http://apt.ntop.org/buster all/\ndeb http://apt.ntop.org/buster x64/">/etc/apt/sources.list.d/ntop.list ; \
+    else echo "deb http://apt.ntop.org/buster_pi armhf/\ndeb http://apt.ntop.org/buster_pi all/">/etc/apt/sources.list.d/ntop.list ;\
+    fi \
+    && find /etc/apt/ -type f -iname "*.list" && echo "lists: " && cat /etc/apt/sources.list.d/ntop.list \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* \
+    && apt-cache show ntopng && apt-cache policy ntopng \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi ;
 
-RUN chmod +x /start.sh && apt clean all && \
- apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -q install wget lsb-release gnupg tzdata && \
- wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
-
-RUN if [ "$(uname -m)" = "x86_64" ]; then \
- wget http://apt.ntop.org/buster/all/apt-ntop.deb && \
- apt install -y ./apt-ntop.deb  ; rm -rf apt-ntop.deb; \
- cat /etc/apt/sources.list.d/ntop.list ;\
- else \
- echo "deb http://apt.ntop.org/buster_pi armhf/" > /etc/apt/sources.list.d/ntop.list; \
- echo "deb http://apt.ntop.org/buster_pi all/" >> /etc/apt/sources.list.d/ntop.list; \
- cat /etc/apt/sources.list.d/ntop.list ;\
- fi;
-
-RUN apt-get clean all && apt-get update && apt-get upgrade -y && \
- DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* && \
- apt-cache policy ntopng && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
- if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi ; \
- ls -al /etc/apt/apt.conf.d/
+ADD start.sh /start.sh
+RUN chmod +x /start.sh && cat /etc/apt/sources.list.d/ntop.list \
+    && ls -al /etc/apt/apt.conf.d/
 
 VOLUME /var/lib/ntopng
 
-EXPOSE 3001 5556
+# ntopng port
+EXPOSE 3000
+# nProbe port
+EXPOSE 5556
 
 ENTRYPOINT ["/start.sh"]
 
