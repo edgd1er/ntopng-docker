@@ -1,0 +1,30 @@
+version: '2.0'
+services:
+  ntopng:
+    image: edgd1er/ntopng:dev-latest
+    hostname: ntopng
+    restart: always
+    environment:
+      TZ: "Europe/paris"
+      NTOP_UID: 1000
+      NTOP_GID: 1000
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./data/ntopng:/var/lib/ntopng
+    command: --community -d /var/lib/ntopng -w 0.0.0.0:27833 -r localhost:6379 -Z "/monitor"
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    command: --save 900 1
+    volumes:
+      - ./data/redis:/data
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  data_ntopng:
+  data_redis:
