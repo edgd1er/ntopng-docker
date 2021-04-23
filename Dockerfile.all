@@ -3,31 +3,34 @@ LABEL maintainer="edgd1er <edgd1er@hotmail.com>"
 
 ARG aptcacher
 ARG TZ
+ARG TAG
+ARG STABLE
 
 ENV TZ=${TZ}
 
+ADD start.sh /start.sh
+#No stable build for armhf
 #add apt-cacher setting if present:
 RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
     echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi; \
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -qy wget lsb-release gnupg tzdata && \
-    wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add - \
-    #wget http://apt.ntop.org/buster/all/apt-ntop.deb && apt-get install -qy ./apt-ntop.deb && rm -rf apt-ntop.deb \
-    #apt-get -y -q install wget lsb-release gnupg && wget -q http://packages.ntop.org/RaspberryPI/apt-ntop_1.0.190416-469_all.deb && dpkg -i apt-ntop_1.0.190416-469_all.deb && apt-get clean all \
-    && if [ "$(uname -m)" = "x86_64" ]; then \
-    echo "deb http://apt.ntop.org/buster all/\ndeb http://apt.ntop.org/buster x64/">/etc/apt/sources.list.d/ntop.list ; \
-    else echo "deb http://apt.ntop.org/buster_pi armhf/\ndeb http://apt.ntop.org/buster_pi all/">/etc/apt/sources.list.d/ntop.list ;\
-    fi \
-    && find /etc/apt/ -type f -iname "*.list" && echo "lists: " && cat /etc/apt/sources.list.d/ntop.list \
+    apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qqy wget lsb-release gnupg tzdata && \
+    wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
+    # change repository according to cpu arch
+RUN if [ "${TAG%%-*}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
+    && if [ "$(uname -m)" = "x86_64" ]; then ARM=; CPU=x64; else ARM=_pi; CPU=armhf; fi \
+    # define url for stable or dev
+    && echo "Buidling for tag ${TAG} (repo type ${STABLE:-nightly}), for cpu ${CPU} with packages url: ${URL}"  \
+    # define url for stable or dev and archcpu
+    && echo "deb https://packages.ntop.org/apt${STABLE}/buster${ARM}/ ${CPU}/\ndeb https://packages.ntop.org/apt${STABLE}/buster${ARM}/ all/" | tee  /etc/apt/sources.list.d/ntop${STABLE}.list \
+    && sed -i "s/main$/main contrib/" /etc/apt/sources.list \
+    && find /etc/apt/ -type f -iname "*.list" -print -exec cat {} \; \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* \
     && apt-cache show ntopng && apt-cache policy ntopng \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi ;
-
-ADD start.sh /start.sh
-RUN chmod +x /start.sh && cat /etc/apt/sources.list.d/ntop.list \
-    && ls -al /etc/apt/apt.conf.d/
+    && if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi \
+    && chmod +x /start.sh
 
 VOLUME /var/lib/ntopng
 
@@ -38,7 +41,7 @@ EXPOSE 5556
 
 ENTRYPOINT ["/start.sh"]
 
-#HEALTHCHECK curl --connect-timeout 15 --silent --show-error --fail "http://localhost:3001" >/dev/null
+HEALTHCHECK CMD curl --connect-timeout 15 --silent --show-error --fail "http://localhost:3000">/dev/null
 
 CMD [                                         \
         "--community",                        \

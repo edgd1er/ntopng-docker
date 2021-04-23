@@ -8,7 +8,7 @@ setTimeZone() {
   if [ -e /usr/share/zoneinfo/${TZ} ]; then
     echo "Setting timezone to ${TZ}"
     ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime
-    dpkg-reconfigure -fnoninteractive tzdata
+    dpkg-reconfigure -f noninteractive tzdata
   else
     echo "Error, cannot set timezone to ${TZ}"
   fi
