@@ -1,15 +1,16 @@
-![build ntopng-docker multi-arch images](https://github.com/edgd1er/ntopng-docker/workflows/build%20ntopng-docker%20multi-arch%20images/badge.svg?branch=master)
+![build ntopng-docker amd64 image with stable repository (no armhf)](https://github.com/edgd1er/ntopng-docker/workflows/build%20ntopng-docker%20amd64%20image%20with%20stable%20repository%20(no%20armhf)/badge.svg?branch=master)
+![build ntopng-docker multi-arch images with nightly repository](https://github.com/edgd1er/ntopng-docker/workflows/build%20ntopng-docker%20multi-arch%20images%20with%20nightly%20repository/badge.svg?branch=master)
 
 # ntopng-docker
 
 simple container to analyze network traffic based on https://github.com/Laisky/ntopng-docker for amd64 and arm.
 
 * use debian buster-slim image to have small base image
-* add nightly build for ntopng https://packages.ntop.org/apt/
-* as of 2021/04/21, ntop version is v.4.3
-  
-    armhf latest version is here: https://packages.ntop.org/RaspberryPI/buster_pi/armhf/ntopng/
+* two tags: dev-latest for latest nightly (armhf, adm64), stable-latest for latest stable (amd64)
+* as of 2021/04/21, ntop version is v.4.2 for stable, 4.3 for nightly.
+* For the moment, no stable armhf version is available.
     
+armhf latest version is here: https://packages.ntop.org/RaspberryPI/buster_pi/armhf/ntopng/
 
 Official Docker file are here: https://github.com/ntop/docker-ntop
 

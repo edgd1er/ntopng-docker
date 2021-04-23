@@ -50,7 +50,4 @@ setGid() {
 setTimeZone
 setUid
 setGid
-which ntopng
-echo find
-find / -iname ntopng -type f
 ntopng "$@"
