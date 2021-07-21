@@ -2,11 +2,13 @@
 #
 IMAGE=ntopng
 TAG=latest
+#TAG=latest-stable
 DUSER=edgd1er
 CACHE=""
 #CACHE=" --no-cache"
-aptcacher=$(ip route get 1 | awk '{print $7}')
+aptcacher= #$(ip route get 1 | awk '{print $7}')
 WHERE="--load"
+
 
 #fonctions
 enableMultiArch() {
@@ -44,14 +46,13 @@ done
 shift $((OPTIND - 1))
 
 ##add amd if running on amd
-[[ $(uname -m) =~ "x86_64" ]] && PTF="linux/amd64"
+[[ $(uname -m) =~ "x86_64" ]] && PTF="linux/amd64" || PTF="linux/arm/v7"
 [[ ${WHERE} =~ push ]] && PTF+=",linux/arm/v7" && enableMultiArch
 
 
-echo -e "\nWhere: \e[32m$WHERE\e[0m,  building \e[32m$TAG\e[0m with cahced apt \e[32m${aptcacher}\e[0m on os \e[32m$DISTRO\e[0m using cache \e[32m$CACHE\e[0m and apt cache \e[32m$aptCacher\e[0m for platform \e[32m${PTF}\e[0m\n\n"
+echo -e "\nWhere: \e[32m$WHERE\e[0m,  building \e[32m$TAG\e[0m with cached apt \e[32m${aptcacher:-\"none\"}\e[0m using cache \e[32m$CACHE\e[0m and apt cache \e[32m$aptCacher\e[0m for platform \e[32m${PTF}\e[0m\n\n"
 
-
-docker buildx build ${WHERE} --platform ${PTF} --build-arg aptcacher=${aptcacher} -f Dockerfile.all -t ${DUSER}/${IMAGE}:${TAG} .
+docker buildx build ${WHERE} --platform ${PTF} --build-arg TAG=${TAG} --build-arg TZ=America/Chicago --build-arg aptcacher=${aptcacher} -f Dockerfile.all -t ${DUSER}/${IMAGE}:${TAG} .
 ret=$?
 [[ ${ret} != "0" ]] && echo "\n error while building image" && exit 1
 

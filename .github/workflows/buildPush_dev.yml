@@ -2,7 +2,8 @@ name: build ntopng-docker multi-arch images with nightly repository
 
 on:
   push:
-    branches: "master"
+    branches:
+     - master
 env:
   IMAGE: ntopng
 
