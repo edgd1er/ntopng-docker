@@ -1,11 +1,11 @@
 version: '2.0'
 services:
   ntopng:
-    image: edgd1er/ntopng:dev-latest
+    image: edgd1er/ntopng:latest
     hostname: ntopng
     restart: always
     environment:
-      TZ: "Europe/paris"
+      TZ: "Europe/Paris"
       NTOP_UID: 1000
       NTOP_GID: 1000
     network_mode: host
@@ -17,7 +17,7 @@ services:
     depends_on:
       - redis
   redis:
-    image: redis:alpine
+    image: redis:latest
     command: --save 900 1
     volumes:
       - ./data/redis:/data
