@@ -8,13 +8,15 @@ ARG STABLE
 
 ENV TZ=${TZ}
 
-ADD start.sh /start.sh
 #No stable build for armhf
 #add apt-cacher setting if present:
 RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
     echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi; \
     apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qqy wget lsb-release gnupg tzdata && \
     wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
+
+ADD start.sh /start.sh
+
     # change repository according to cpu arch
 RUN if [ "${TAG%%-*}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && if [ "$(uname -m)" = "x86_64" ]; then ARM=; CPU=x64; else ARM=_pi; CPU=armhf; fi \
@@ -26,10 +28,10 @@ RUN if [ "${TAG%%-*}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && find /etc/apt/ -type f -iname "*.list" -print -exec cat {} \; \
     && apt-get update \
     && apt-cache show ntopng && apt-cache policy ntopng \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* libcap2 net-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && if [ -f /etc/apt/apt.conf.d/01proxy ]; then rm /etc/apt/apt.conf.d/01proxy; fi \
+    && if [ -n ${aptcacher} ]; then rm /etc/apt/apt.conf.d/01proxy; fi \
     && chmod +x /start.sh
 
 VOLUME /var/lib/ntopng
