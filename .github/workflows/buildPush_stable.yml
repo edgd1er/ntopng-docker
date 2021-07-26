@@ -1,6 +1,7 @@
-name: build ntopng-docker amd64 image with stable repository (no armhf)
+name: build amd64 image with stable repository (no armhf)
 
 on:
+  workflow_dispatch:
   push:
     branches: "master"
 env:
@@ -14,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         #No stable for armhf
-        tag: [ stable-latest ]
+        tag: [ latest ]
 
     env:
       TAG: ${{ matrix.tag }}

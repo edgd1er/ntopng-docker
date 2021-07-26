@@ -18,7 +18,7 @@ RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher
 ADD start.sh /start.sh
 
     # change repository according to cpu arch
-RUN if [ "${TAG%%-*}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
+RUN if [ "${TAG}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && if [ "$(uname -m)" = "x86_64" ]; then ARM=; CPU=x64; else ARM=_pi; CPU=armhf; fi \
     # define url for stable or dev
     && echo "Buidling for tag ${TAG} (repo type ${STABLE:-nightly}), for cpu ${CPU} with packages url: ${URL}"  \
@@ -28,7 +28,7 @@ RUN if [ "${TAG%%-*}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && find /etc/apt/ -type f -iname "*.list" -print -exec cat {} \; \
     && apt-get update \
     && apt-cache show ntopng && apt-cache policy ntopng \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* libcap2 net-tools \
+    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* ntopng-data libcap2 net-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && if [ -n ${aptcacher} ]; then rm /etc/apt/apt.conf.d/01proxy; fi \

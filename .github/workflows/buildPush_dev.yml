@@ -1,6 +1,7 @@
-name: build ntopng-docker multi-arch images with nightly repository
+name: build multi-arch images with nightly repository
 
 on:
+  workflow_dispatch:
   push:
     branches:
      - master
@@ -15,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         #no stable for armhf
-        tag: [ dev-latest ]
+        tag: [ nightly-latest ]
 
     env:
       TAG: ${{ matrix.tag }}
