@@ -1,4 +1,4 @@
-name: lint nordvpn proxy dockerfile
+name: lint ntopng dockerfile
 
 on:
   workflow_dispatch:

@@ -1,6 +1,8 @@
-FROM debian:buster-slim
+ARG DEBIAN_VER
+FROM debian:${DEBIAN_VER}-slim
 LABEL maintainer="edgd1er <edgd1er@hotmail.com>"
 
+ARG DEBIAN_VER
 ARG aptcacher
 ARG TZ
 ARG TAG
@@ -8,30 +10,31 @@ ARG STABLE
 
 ENV TZ=${TZ}
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+COPY start.sh /start.sh
 #No stable build for armhf
 #add apt-cacher setting if present:
-RUN if [ -n ${aptcacher} ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
+#hadolint ignore=DL3008,SC2086
+RUN if [ -n "${aptcacher}" ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
     echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi; \
-    apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qqy wget lsb-release gnupg tzdata && \
-    wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add -
-
-ADD start.sh /start.sh
-
+    apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -qqy wget lsb-release \
+    gnupg tzdata && wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add - \
     # change repository according to cpu arch
-RUN if [ "${TAG}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
+    && if [ "${TAG}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && if [ "$(uname -m)" = "x86_64" ]; then ARM=; CPU=x64; else ARM=_pi; CPU=armhf; fi \
     # define url for stable or dev
     && echo "Buidling for tag ${TAG} (repo type ${STABLE:-nightly}), for cpu ${CPU} with packages url: ${URL}"  \
     # define url for stable or dev and archcpu
-    && echo "deb https://packages.ntop.org/apt${STABLE}/buster${ARM}/ ${CPU}/\ndeb https://packages.ntop.org/apt${STABLE}/buster${ARM}/ all/" | tee  /etc/apt/sources.list.d/ntop${STABLE}.list \
+    && echo "deb https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ ${CPU}/\ndeb https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ all/" | tee  /etc/apt/sources.list.d/ntop${STABLE}.list \
     && sed -i "s/main$/main contrib/" /etc/apt/sources.list \
     && find /etc/apt/ -type f -iname "*.list" -print -exec cat {} \; \
     && apt-get update \
     && apt-cache show ntopng && apt-cache policy ntopng \
-    && DEBIAN_FRONTEND=noninteractive apt-get -y install ntopng=4\* ntopng-data libcap2 net-tools \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y ntopng ntopng-data libcap2 net-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && if [ -n ${aptcacher} ]; then rm /etc/apt/apt.conf.d/01proxy; fi \
+    && if [ -n "${aptcacher}" ]; then rm /etc/apt/apt.conf.d/01proxy; fi \
     && chmod +x /start.sh
 
 VOLUME /var/lib/ntopng

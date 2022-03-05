@@ -19,6 +19,7 @@ jobs:
 
     env:
       TAG: ${{ matrix.tag }}
+      DEBIAN_VER: bullseye
     steps:
       - name: checkout code
         uses: actions/checkout@v3
@@ -60,6 +61,7 @@ jobs:
           build-args: |
             TZ: Europe/Paris
             TAG: ${{ matrix.TAG }}
+            DEBIAN_VER: ${{ env.DEBIAN_VER }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           #no stable for armhf

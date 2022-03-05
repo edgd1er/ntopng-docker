@@ -11,9 +11,9 @@
 
 simple container to analyze network traffic based on https://github.com/Laisky/ntopng-docker for amd64 and arm.
 
-* use debian buster-slim image to have small base image
+* use debian bullseye-slim image to have small base image
 * two tags: dev-latest for latest nightly (armhf, adm64), stable-latest for latest stable (amd64)
-* as of 2021/04/21, ntop version is v.4.2 for stable, 4.3 for nightly.
+* as of 2022/03/05, ntop version is v.5.2 for stable, 5.3 for nightly.
 * For the moment, no stable armhf version is available.
 
 Docker tags:
@@ -47,3 +47,6 @@ env value NTOP_UID and NTOP_GID are available to match user and group of local m
 
 Note that with netplan.io, it is not possible to set an interface in promiscous mode, ie you can't monitor all flows, but only flows from or to the host.
 if anyone knows how to do with netplan, please let me know. 
+
+This command may help to set the interface to promiscuous mode: 
+`ip set link <interface> up promisc on`
