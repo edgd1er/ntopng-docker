@@ -19,16 +19,17 @@ COPY start.sh /start.sh
 RUN if [ -n "${aptcacher}" ]; then echo "Acquire::http::Proxy \"http://${aptcacher}:3142\";" >/etc/apt/apt.conf.d/01proxy && \
     echo "Acquire::https::Proxy \"http://${aptcacher}:3142\";" >>/etc/apt/apt.conf.d/01proxy ; fi; \
     apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -qqy wget lsb-release \
-    gnupg tzdata && wget -qO - http://packages.ntop.org/apt/ntop.key | apt-key add - \
+    gnupg tzdata ca-certificates && \
+    wget -qO- http://packages.ntop.org/apt/ntop.key | gpg --dearmor >/usr/share/keyrings/ntopng-archive-keyring.gpg && \
     # change repository according to cpu arch
-    && if [ "${TAG}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
+    if [ "${TAG}" = "stable" ]; then STABLE="-stable"; else STABLE=""; fi \
     && if [ "$(uname -m)" = "x86_64" ]; then ARM=; CPU=x64; else ARM=_pi; CPU=armhf; fi \
     # define url for stable or dev
     && echo "Buidling for tag ${TAG} (repo type ${STABLE:-nightly}), for cpu ${CPU} with packages url: ${URL}"  \
     # define url for stable or dev and archcpu
-    && echo "deb https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ ${CPU}/\ndeb https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ all/" | tee  /etc/apt/sources.list.d/ntop${STABLE}.list \
+    && echo -e "deb [signed-by=/usr/share/keyrings/ntopng-archive-keyring.gpg] https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ ${CPU}/ \
+    \ndeb [signed-by=/usr/share/keyrings/ntopng-archive-keyring.gpg] https://packages.ntop.org/apt${STABLE}/${DEBIAN_VER}${ARM}/ all/" | tee  /etc/apt/sources.list.d/ntop${STABLE}.list \
     && sed -i "s/main$/main contrib/" /etc/apt/sources.list \
-    && find /etc/apt/ -type f -iname "*.list" -print -exec cat {} \; \
     && apt-get update \
     && apt-cache show ntopng && apt-cache policy ntopng \
     && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y ntopng ntopng-data libcap2 net-tools \
